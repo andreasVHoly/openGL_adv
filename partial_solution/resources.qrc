@@ -1,0 +1,8 @@
+<RCC>
+    <qresource prefix="/">
+        <file>simple.frag</file>
+        <file>simple.vert</file>
+        <file>bunny.stl</file>
+        <file>porsche.stl</file>
+    </qresource>
+</RCC>
