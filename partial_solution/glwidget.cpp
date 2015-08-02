@@ -74,7 +74,7 @@ void GLWidget::initializeGL()
 
     //set initial color:
 
-rot += M_PI / 180.0 * 180.0; // rotate by 5 degrees
+//rot += M_PI / 180.0 * 180.0; // rotate by 5 degrees
 
 //    glUniform4f(glGetUniformLocation(m_shader.programId(),"ambprod"),0.3f,0.0f,0.0f,1.0f);
 
@@ -137,10 +137,10 @@ void GLWidget::paintGL()
         glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &ModelMatrix[0][0]);
        // glUniform4f(glGetUniformLocation(m_shader.programId(),"fcolor"),0.0f,1.0f,0.0f,1.0f);
 
-        glUniform4f(glGetUniformLocation(m_shader.programId(),"ambprod"),0.3f,0.0f,0.0f,1.0f);
-        glUniform4f(glGetUniformLocation(m_shader.programId(),"diffprod"),0.3f,0.0f,0.0f,1.0f);
-        glUniform4f(glGetUniformLocation(m_shader.programId(),"specprod"),0.3f,0.0f,0.0f,1.0f);
-        glUniform4f(glGetUniformLocation(m_shader.programId(),"lpos"),100000000000.0f,10000000000.5f,10000000000000000.5f,1000000000.0f);//set to cameras position
+        glUniform4f(glGetUniformLocation(m_shader.programId(),"ambprod"),0.1f,0.1f,0.1f,1.0f);
+        glUniform4f(glGetUniformLocation(m_shader.programId(),"diffprod"),0.3f,0.0f,0.4f,1.0f);
+        glUniform4f(glGetUniformLocation(m_shader.programId(),"specprod"),1.0f,1.0f,1.0f,1.0f);
+       // glUniform4f(glGetUniformLocation(m_shader.programId(),"lpos"),0.0f,0.0f,0.0f,0.0f);//set to cameras position
         glUniform1f(glGetUniformLocation(m_shader.programId(),"shine"),0.8f);
 
 
