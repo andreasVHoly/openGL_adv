@@ -61,11 +61,11 @@ namespace bhugo{
             glBindVertexArray(vao);
             glBindBuffer(GL_ARRAY_BUFFER,vbo);
             #define BUFFER_OFFSET(i) ((void*)(i))
-            GLuint vPosition = glGetAttribLocation(shader_program, "vertex");
+            GLuint vPosition = glGetAttribLocation(shader_program, "vert");
             glEnableVertexAttribArray(vPosition);
             glVertexAttribPointer(vPosition,3,GL_FLOAT,GL_FALSE,0,BUFFER_OFFSET(0));
 
-            GLuint vNormal = glGetAttribLocation(shader_program, "normal");
+            GLuint vNormal = glGetAttribLocation(shader_program, "norm");
             glEnableVertexAttribArray(vNormal);
             glVertexAttribPointer(vNormal,3,GL_FLOAT,GL_FALSE,0,BUFFER_OFFSET(sizeof(bhugo::triangle<float>) * number_of_triangles));
             glDrawArrays( GL_TRIANGLES, 0, number_of_triangles * 3 );

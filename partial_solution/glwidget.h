@@ -41,6 +41,8 @@ private:
     float rot;
     ROT_AXIS current_rot_axis;
     glm::vec3 current_translation;
+    void recalibrate();
+
 };
 
 #endif // GLWIDGET_H

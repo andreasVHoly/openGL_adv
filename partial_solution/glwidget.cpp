@@ -60,14 +60,40 @@ void GLWidget::initializeGL()
         qWarning() << "Could not bind shader program to context";
         return;
     }
+
+
+
+
+
     //setup the shader to use GLSL variable "vertex" as input to the currently loaded vbo
-    m_shader.setAttributeBuffer( "vertex", GL_FLOAT, 0, 3 );
-    m_shader.enableAttributeArray( "vertex" );
+    m_shader.setAttributeBuffer( "vert", GL_FLOAT, 0, 3 );
+    m_shader.enableAttributeArray( "vert" );
+
+    m_shader.setAttributeBuffer( "norm", GL_FLOAT, 0, 3 );
+    m_shader.enableAttributeArray( "norm" );
+
     //set initial color:
-    glUniform4f(glGetUniformLocation(m_shader.programId(),"fcolor"),0.0f,1.0f,0.0f,1.0f);
+
+rot += M_PI / 180.0 * 180.0; // rotate by 5 degrees
+
+//    glUniform4f(glGetUniformLocation(m_shader.programId(),"ambprod"),0.3f,0.0f,0.0f,1.0f);
+
+//    glUniform4f(glGetUniformLocation(m_shader.programId(),"diffprod"),0.3f,0.0f,0.0f,1.0f);
+//    glUniform4f(glGetUniformLocation(m_shader.programId(),"specprod"),0.4f,0.0f,0.0f,1.0f);
+//    glUniform4f(glGetUniformLocation(m_shader.programId(),"lpos"),1.0f,0.5f,1.5f,0.0f);//set to cameras position
+//    glUniform1f(glGetUniformLocation(m_shader.programId(),"shine"),0.3f);
+
+
+
     glm::vec3 cam_pos(0.0f,0.5f,1.5f);
+
+
+
+
     //setup a fixed camera (http://www.opengl-tutorial.org/beginners-tutorials/tutorial-3-matrices/)
     CameraMatrix = glm::lookAt(cam_pos,glm::vec3(0.0f,0.0f,0.0f),glm::vec3(0.0f,1.0f,0.0f));
+
+
     ProjectionMatrix = glm::perspective(
         45.0f,         // The horizontal Field of View, in degrees : the amount of "zoom". Think "camera lens". Usually between 90° (extra wide) and 30° (quite zoomed in)
         4.0f / 3.0f, // Aspect Ratio. Depends on the size of your window. Notice that 4/3 == 800/600 == 1280/960, sounds familiar ?
@@ -82,7 +108,13 @@ void GLWidget::initializeGL()
         GLuint MatrixID = glGetUniformLocation(m_shader.programId(), "Projection");
         glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &ProjectionMatrix[0][0]);
     }
+
+
+
 }
+
+
+
 
 void GLWidget::resizeGL( int w, int h )
 {
@@ -96,21 +128,39 @@ void GLWidget::paintGL()
     glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
     //draw a bunny
     {
+
+
+
         glm::vec3 rot_vec = (current_rot_axis == ROT_AXIS::X) ? glm::vec3(1.0f,0.0f,0.0f) : (current_rot_axis == ROT_AXIS::Y) ? glm::vec3(0.0f,1.0f,0.0f) : glm::vec3(0.0f,0.0f,1.0f);
         glm::mat4 ModelMatrix = glm::rotate(glm::translate(glm::mat4(1.0f),current_translation),rot,rot_vec);
         GLuint MatrixID = glGetUniformLocation(m_shader.programId(), "Model");
         glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &ModelMatrix[0][0]);
-        glUniform4f(glGetUniformLocation(m_shader.programId(),"fcolor"),0.0f,1.0f,0.0f,1.0f);
+       // glUniform4f(glGetUniformLocation(m_shader.programId(),"fcolor"),0.0f,1.0f,0.0f,1.0f);
+
+        glUniform4f(glGetUniformLocation(m_shader.programId(),"ambprod"),0.3f,0.0f,0.0f,1.0f);
+        glUniform4f(glGetUniformLocation(m_shader.programId(),"diffprod"),0.3f,0.0f,0.0f,1.0f);
+        glUniform4f(glGetUniformLocation(m_shader.programId(),"specprod"),0.3f,0.0f,0.0f,1.0f);
+        glUniform4f(glGetUniformLocation(m_shader.programId(),"lpos"),100000000000.0f,10000000000.5f,10000000000000000.5f,1000000000.0f);//set to cameras position
+        glUniform1f(glGetUniformLocation(m_shader.programId(),"shine"),0.8f);
+
+
+
+
+
+
+
+
+
         this->bunny.draw(m_shader.programId());
     }
     //draw a car (stationary)
-    {
+    /*{
         glm::mat4 ModelMatrix = glm::scale(glm::rotate(glm::translate(glm::mat4(1.0f),glm::vec3(0.5f,0.0f,0.0f)),-(float)M_PI/2.0f,glm::vec3(1.0f,0.0f,0.0f)),glm::vec3(0.005f,0.005f,0.005f));
         GLuint MatrixID = glGetUniformLocation(m_shader.programId(), "Model");
         glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &ModelMatrix[0][0]);
         glUniform4f(glGetUniformLocation(m_shader.programId(),"fcolor"),1.0f,0.0f,0.0f,1.0f);
         this->porsche.draw(m_shader.programId());
-    }
+    }*/
 
 }
 
