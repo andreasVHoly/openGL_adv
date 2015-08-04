@@ -3,6 +3,8 @@
 #include <QCoreApplication>
 #include <QKeyEvent>
 #include <stdexcept>
+#include <math.h>
+#include <iostream>
 
 #define VERT_SHADER ":/simple.vert"
 #define FRAG_SHADER ":/simple.frag"
@@ -48,6 +50,7 @@ void GLWidget::initializeGL()
     qDebug() << "Attempting to load the Stanford Bunny " << BUNNY;
     bunny = std::move(bhugo::model(BUNNY));
     //bunny.renormalize();
+
     qDebug() << "Attempting vertex shader load from " << VERT_SHADER;
     qDebug() << "Attempting fragment shader load from " << FRAG_SHADER;
     // Prepare a complete shader program...
@@ -72,23 +75,34 @@ void GLWidget::initializeGL()
     m_shader.setAttributeBuffer( "norm", GL_FLOAT, 0, 3 );
     m_shader.enableAttributeArray( "norm" );
 
-    //set initial color:
 
-//rot += M_PI / 180.0 * 180.0; // rotate by 5 degrees
 
-//    glUniform4f(glGetUniformLocation(m_shader.programId(),"ambprod"),0.3f,0.0f,0.0f,1.0f);
+    orbitLight.origin.x = 1;
+    orbitLight.origin.y = 1;
+    orbitLight.radius = 1.5;
+    orbitLight.zPos = orbitLight.getZ(orbitLight.origin.x+orbitLight.radius);
+    orbitLight.xPos = orbitLight.getX(orbitLight.zPos);
+    orbitLight.yPos = 0;
+    std::cout << orbitLight.xPos << " " << orbitLight.yPos << " " << orbitLight.zPos << std::endl;
 
-//    glUniform4f(glGetUniformLocation(m_shader.programId(),"diffprod"),0.3f,0.0f,0.0f,1.0f);
-//    glUniform4f(glGetUniformLocation(m_shader.programId(),"specprod"),0.4f,0.0f,0.0f,1.0f);
-//    glUniform4f(glGetUniformLocation(m_shader.programId(),"lpos"),1.0f,0.5f,1.5f,0.0f);//set to cameras position
-//    glUniform1f(glGetUniformLocation(m_shader.programId(),"shine"),0.3f);
+
+
+
+//    orbitLight.angle = 0.0f;
+//    orbitLight.radius = 1.5f;
+//    orbitLight.xPos = 0.0f;
+
+//    orbitLight.yPos = 0.5f;
+//    orbitLight.zPos = 1.5f;
+////    orbitLight.xPos = 0.0f;
+////    orbitLight.yPos = 0.0f;
+////    orbitLight.zPos = 0.0f;
+
+//    orbitLight.smoothing = 0.05f;
 
 
 
     glm::vec3 cam_pos(0.0f,0.5f,1.5f);
-
-
-
 
     //setup a fixed camera (http://www.opengl-tutorial.org/beginners-tutorials/tutorial-3-matrices/)
     CameraMatrix = glm::lookAt(cam_pos,glm::vec3(0.0f,0.0f,0.0f),glm::vec3(0.0f,1.0f,0.0f));
@@ -114,6 +128,32 @@ void GLWidget::initializeGL()
 }
 
 
+void GLWidget::rotate(){
+    float sinShift = sin(orbitLight.rotationSpeed);
+    float cosShift = cos(orbitLight.rotationSpeed);
+
+    float targetX = 0;
+    float targetZ = 0;
+
+
+    float pX = orbitLight.xPos - targetX;
+    float pZ = orbitLight.zPos - targetZ;
+
+    float posX = pX * cosShift - pZ * sinShift;
+    float posZ = pX * sinShift + pZ * cosShift;
+
+    orbitLight.xPos = targetX + posX;
+    orbitLight.zPos = targetZ + posZ;
+    std::cout << orbitLight.xPos << " " << orbitLight.yPos << " " << orbitLight.zPos << std::endl;
+}
+
+
+//void GLWidget::setPosition(){
+
+//    orbitLight.xPos = orbitLight.radius * cos(orbitLight.angle);
+//    orbitLight.zPos = orbitLight.radius * sin(orbitLight.angle);
+
+//}
 
 
 void GLWidget::resizeGL( int w, int h )
@@ -124,15 +164,18 @@ void GLWidget::resizeGL( int w, int h )
 
 void GLWidget::paintGL()
 {
+
     // Clear the buffer with the current clearing color
     glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
+    rotate();
+    glUniform4f(glGetUniformLocation(m_shader.programId(),"lpos"),orbitLight.xPos,orbitLight.yPos,orbitLight.zPos,1.0f);//set to cameras position
     //draw a bunny
     {
 
 
 
         glm::vec3 rot_vec = (current_rot_axis == ROT_AXIS::X) ? glm::vec3(1.0f,0.0f,0.0f) : (current_rot_axis == ROT_AXIS::Y) ? glm::vec3(0.0f,1.0f,0.0f) : glm::vec3(0.0f,0.0f,1.0f);
-        glm::mat4 ModelMatrix = glm::rotate(glm::translate(glm::mat4(1.0f),current_translation),rot,rot_vec);
+        glm::mat4 ModelMatrix = glm::rotate(glm::translate(glm::mat4(1.0f),glm::vec3(0,0,1.0f)),rot,rot_vec);
         GLuint MatrixID = glGetUniformLocation(m_shader.programId(), "Model");
         glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &ModelMatrix[0][0]);
        // glUniform4f(glGetUniformLocation(m_shader.programId(),"fcolor"),0.0f,1.0f,0.0f,1.0f);
@@ -140,16 +183,7 @@ void GLWidget::paintGL()
         glUniform4f(glGetUniformLocation(m_shader.programId(),"ambprod"),0.1f,0.1f,0.1f,1.0f);
         glUniform4f(glGetUniformLocation(m_shader.programId(),"diffprod"),0.3f,0.0f,0.4f,1.0f);
         glUniform4f(glGetUniformLocation(m_shader.programId(),"specprod"),1.0f,1.0f,1.0f,1.0f);
-       // glUniform4f(glGetUniformLocation(m_shader.programId(),"lpos"),0.0f,0.0f,0.0f,0.0f);//set to cameras position
         glUniform1f(glGetUniformLocation(m_shader.programId(),"shine"),0.8f);
-
-
-
-
-
-
-
-
 
         this->bunny.draw(m_shader.programId());
     }
@@ -172,19 +206,21 @@ void GLWidget::keyPressEvent( QKeyEvent* e )
             QCoreApplication::instance()->quit();
             break;
         case Qt::Key_Down:
-            current_translation += glm::vec3(0,0,0.05f);
+            //current_translation += glm::vec3(0,0,0.05f);
             this->repaint();
             break;
         case Qt::Key_Up:
-            current_translation -= glm::vec3(0,0,0.05f);
+            //current_translation -= glm::vec3(0,0,0.05f);
             this->repaint();
             break;
         case Qt::Key_Left:
-            current_translation -= glm::vec3(0.05f,0,0);
+            //current_translation -= glm::vec3(0.05f,0,0);
+            rotate();
             this->repaint();
             break;
         case Qt::Key_Right:
-            current_translation += glm::vec3(0.05f,0,0);
+            rotate();
+            //current_translation += glm::vec3(0.05f,0,0);
             this->repaint();
             break;
         case Qt::Key_R:

@@ -34,7 +34,7 @@ void main(){
     L = lpos.xyz - vert.xyz;
     E = -vert.xyz;
     //old
-    gl_Position = Projection * View * vert/*vec4(vertex, 1.0)*/;
+    gl_Position = Projection * Model * View * vert/*vec4(vertex, 1.0)*/;
 }
 
 
