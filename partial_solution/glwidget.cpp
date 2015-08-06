@@ -6,6 +6,13 @@
 #include <math.h>
 #include <iostream>
 
+
+#ifndef M_PI
+#define M_PI           3.14159265358979323846
+#endif
+
+
+
 #define VERT_SHADER ":/simple.vert"
 #define FRAG_SHADER ":/simple.frag"
 #define BUNNY ":/bunny.stl"
